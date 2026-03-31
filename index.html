@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Attendance Calculator</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            width: 320px;
+            margin: auto;
+        }
+
+        input, select {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #22c55e;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .good { color: #4ade80; }
+        .bad { color: #f87171; }
+    </style>
+</head>
+
+<body>
+
+<h1>Smart Attendance Calculator</h1>
+
+<div class="box">
+
+    <input type="number" id="total" placeholder="Total Classes">
+    <input type="number" id="attended" placeholder="Classes Attended">
+
+    <select id="target">
+        <option value="75">Target: 75%</option>
+        <option value="85">Target: 85%</option>
+    </select>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function calculate() {
+
+    let total = parseInt(document.getElementById("total").value);
+    let attended = parseInt(document.getElementById("attended").value);
+    let target = parseInt(document.getElementById("target").value);
+
+    if (!total || !attended || attended > total) {
+        document.getElementById("result").innerHTML = "Enter valid values";
+        return;
+    }
+
+    let current = (attended / total) * 100;
+
+    // Calculate max leaves allowed
+    let leaves = 0;
+    let tempTotal = total;
+    let tempAtt = attended;
+
+    while ((tempAtt / (tempTotal + 1)) * 100 >= target) {
+        tempTotal++;
+        leaves++;
+        if (leaves > 500) break;
+    }
+
+    // Classes needed to recover
+    let needed = 0;
+    let recAtt = attended;
+    let recTotal = total;
+
+    while ((recAtt / recTotal) * 100 < target) {
+        recAtt++;
+        recTotal++;
+        needed++;
+        if (needed > 500) break;
+    }
+
+    let status = current >= target ?
+        "<span class='good'>Safe</span>" :
+        "<span class='bad'>Not Safe</span>";
+
+    document.getElementById("result").innerHTML =
+        "Current Attendance: " + current.toFixed(2) + "% (" + status + ")<br><br>" +
+        "Leaves You Can Take: " + leaves + "<br><br>" +
+        "Classes Needed to Reach " + target + "%: " + needed;
+}
+</script>
+
+</body>
+</html>
